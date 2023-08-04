@@ -20,12 +20,17 @@ class Blob {
     }
 
     crossover(blob: Blob): Blob {
+        const pallet = [];
+        pallet.push(this.clip(this.r + blob.r * (Math.random() * 0.6 - 0.3)));
+        pallet.push(this.clip(this.g + blob.g * (Math.random() * 0.6 - 0.3)));
+        pallet.push(this.clip(this.b + blob.b * (Math.random() * 0.6 - 0.3)))
+
         return new Blob(
             this.x,
             this.y,
-            this.clip(this.r + blob.r * (Math.random() * 0.6 - 0.3)),
-            this.clip(this.g + blob.g * (Math.random() * 0.6 - 0.3)),
-            this.clip(this.b + blob.b * (Math.random() * 0.6 - 0.3)),
+            pallet[Math.floor(Math.random() * 3)],
+            pallet[Math.floor(Math.random() * 3)],
+            pallet[Math.floor(Math.random() * 3)],
             0,
             0
         )
