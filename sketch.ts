@@ -23,9 +23,9 @@ class Blob {
         return new Blob(
             this.x,
             this.y,
-            (this.r + blob.r) / 2,
-            (this.g + blob.g) / 2,
-            (this.b + blob.b) / 2,
+            this.clip(this.r + blob.r * Math.random() * 0.6 - 0.3),
+            this.clip(this.g + blob.g * Math.random() * 0.6 - 0.3),
+            this.clip(this.b + blob.b * Math.random() * 0.6 - 0.3),
             0,
             0
         )
@@ -39,6 +39,10 @@ class Blob {
 
     mutation_with_clip(value: number) {
         value += Math.random() * 0.1;
+        return this.clip(value);
+    }
+
+    clip(value: number): number {
         if (value < 0) {
             value = 0;
         }
