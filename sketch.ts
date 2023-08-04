@@ -36,15 +36,12 @@ class Blob {
         )
     }
 
-    mutation() {
-        this.r = this.mutation_with_clip(this.r);
-        this.g = this.mutation_with_clip(this.g);
-        this.b = this.mutation_with_clip(this.b);
-    }
-
-    mutation_with_clip(value: number) {
-        value += Math.random() * 0.1;
-        return this.clip(value);
+    mutation(alpha: number = 0.3) {
+        console.log("before r: ", this.r);
+        this.r = this.clip(this.r + Math.random() * this.clip(alpha));
+        this.g = this.clip(this.g + Math.random() * this.clip(alpha));
+        this.b = this.clip(this.b + Math.random() * this.clip(alpha));
+        console.log("after r: ", this.r);
     }
 
     clip(value: number): number {
@@ -112,6 +109,7 @@ const fitness_by_blobs = (blobs: Blob[], idx: number): number => {
 const sketch = (p: p5) => {
     let blobs: Blob[] = [];
     let timestamp = 0;
+    let mutation_alpha = 0.3;
 
     p.setup = () => {
         p.createCanvas(400, 400)
@@ -130,6 +128,7 @@ const sketch = (p: p5) => {
         if (p.millis() - timestamp > 30) {
             timestamp = p.millis();
             forward();
+            mutation_alpha -= 0.001;
         }
     }
 
@@ -141,7 +140,7 @@ const sketch = (p: p5) => {
         const parent1 = blobs[Math.floor(Math.random() * blobs.length)];
         const parent2 = blobs[Math.floor(Math.random() * blobs.length)];
         const child = parent1.crossover(parent2);
-        child.mutation();
+        child.mutation(mutation_alpha);
         blobs.push(child);
         if (blobs.length > 100) {
             let min_idx = 0;
@@ -157,7 +156,7 @@ const sketch = (p: p5) => {
         }
         blobs.sort((a, b) => fitness_by_blobs(blobs, blobs.indexOf(b)) - fitness_by_blobs(blobs, blobs.indexOf(a)));
         const val = fitness_by_blobs(blobs, 0);
-        console.log(val);
+        console.log("fitness: ", val);
     }
 }
 
