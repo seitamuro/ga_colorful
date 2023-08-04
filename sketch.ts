@@ -106,7 +106,7 @@ const fitness_by_blobs = (blobs: Blob[], idx: number): number => {
         mean_v += rgbToHsl(element.r * 255, element.g * 255, element.b * 255)[2] / blobs.length;
     })
 
-    return Math.sqrt(mean_h * mean_h / blobs.length) + Math.sqrt(mean_s * mean_s / blobs.length) + Math.sqrt(mean_v * mean_v / blobs.length);
+    return Math.sqrt(mean_h * mean_h / blobs.length);
 }
 
 const sketch = (p: p5) => {
@@ -127,7 +127,7 @@ const sketch = (p: p5) => {
             cnt += 1;
         });
 
-        if (p.millis() - timestamp > 100) {
+        if (p.millis() - timestamp > 30) {
             timestamp = p.millis();
             forward();
         }
@@ -156,6 +156,8 @@ const sketch = (p: p5) => {
             blobs = blobs.filter((_, idx) => idx != min_idx);
         }
         blobs.sort((a, b) => fitness_by_blobs(blobs, blobs.indexOf(b)) - fitness_by_blobs(blobs, blobs.indexOf(a)));
+        const val = fitness_by_blobs(blobs, 0);
+        console.log(val);
     }
 }
 
