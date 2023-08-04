@@ -65,6 +65,50 @@ const fitness = (blob: Blob): number => {
     return variance;
 }
 
+function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+    r /= 255.0;
+    g /= 255.0;
+    b /= 255.0;
+
+    let maxVal = Math.max(r, g, b);
+    let minVal = Math.min(r, g, b);
+
+    let h = (maxVal + minVal) / 2;
+    let s = (maxVal + minVal) / 2;
+    let l = (maxVal + minVal) / 2;
+
+    if (maxVal === minVal) {
+        h = s = 0; // achromatic
+    } else {
+        const d = maxVal - minVal;
+        s = l > 0.5 ? d / (2.0 - maxVal - minVal) : d / (maxVal + minVal);
+
+        switch (maxVal) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+
+        h /= 6;
+    }
+
+    return [h * 360, s * 100, l * 100];
+}
+
+const fitness_by_blobs = (blobs: Blob[], idx: number): number => {
+    const [h, s, v] = rgbToHsl(blobs[idx].r * 255, blobs[idx].g * 255, blobs[idx].b * 255);
+    let mean_h = 0;
+    let mean_s = 0;
+    let mean_v = 0;
+    blobs.forEach((element, idx) => {
+        mean_h += rgbToHsl(element.r * 255, element.g * 255, element.b * 255)[0] / blobs.length;
+        mean_s += rgbToHsl(element.r * 255, element.g * 255, element.b * 255)[1] / blobs.length;
+        mean_v += rgbToHsl(element.r * 255, element.g * 255, element.b * 255)[2] / blobs.length;
+    })
+
+    return Math.sqrt(mean_h * mean_h / blobs.length) + Math.sqrt(mean_s * mean_s / blobs.length) + Math.sqrt(mean_v * mean_v / blobs.length);
+}
+
 const sketch = (p: p5) => {
     let blobs: Blob[] = [];
     let timestamp = 0;
@@ -101,17 +145,17 @@ const sketch = (p: p5) => {
         blobs.push(child);
         if (blobs.length > 100) {
             let min_idx = 0;
-            let min_fitness = fitness(blobs[min_idx]);
-            blobs.forEach(element => {
-                const val: number = fitness(element);
+            let min_fitness = fitness_by_blobs(blobs, min_idx);
+            blobs.forEach((element, idx) => {
+                const val: number = fitness_by_blobs(blobs, idx);
                 if (val < min_fitness) {
                     min_fitness = val;
-                    min_idx = blobs.indexOf(element);
+                    min_idx = idx;
                 }
             })
             blobs = blobs.filter((_, idx) => idx != min_idx);
         }
-        blobs.sort((a, b) => fitness(b) - fitness(a));
+        blobs.sort((a, b) => fitness_by_blobs(blobs, blobs.indexOf(b)) - fitness_by_blobs(blobs, blobs.indexOf(a)));
     }
 }
 
