@@ -61,8 +61,8 @@ class Blob {
 }
 
 const fitness = (blob: Blob): number => {
-    const bonus = Math.max(blob.r, blob.g, blob.b) - Math.min(blob.r, blob.g, blob.b);
-    return blob.r + blob.g + blob.b + bonus * 5;
+    const variance = Math.max(blob.r, blob.g, blob.b) - Math.min(blob.r, blob.g, blob.b);
+    return variance;
 }
 
 const sketch = (p: p5) => {
