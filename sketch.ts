@@ -37,11 +37,9 @@ class Blob {
     }
 
     mutation(alpha: number = 0.3) {
-        console.log("before r: ", this.r);
         this.r = this.clip(this.r + Math.random() * this.clip(alpha));
         this.g = this.clip(this.g + Math.random() * this.clip(alpha));
         this.b = this.clip(this.b + Math.random() * this.clip(alpha));
-        console.log("after r: ", this.r);
     }
 
     clip(value: number): number {
@@ -92,7 +90,8 @@ function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
     return [h * 360, s * 100, l * 100];
 }
 
-const fitness_by_blobs = (blobs: Blob[], idx: number): number => {
+const fitness_by_blobs = (blobs: Blob[], blob: Blob): number => {
+    const idx = blobs.indexOf(blob);
     const [h, s, v] = rgbToHsl(blobs[idx].r * 255, blobs[idx].g * 255, blobs[idx].b * 255);
     let mean_h = 0;
     let mean_s = 0;
@@ -108,6 +107,7 @@ const fitness_by_blobs = (blobs: Blob[], idx: number): number => {
 
 const sketch = (p: p5) => {
     let blobs: Blob[] = [];
+    let all_blobs: Blob[] = [];
     let timestamp = 0;
     let mutation_alpha = 0.3;
 
@@ -115,6 +115,8 @@ const sketch = (p: p5) => {
         p.createCanvas(400, 400)
         blobs.push(new Blob(0, 0, 0, 0, 0, 0, 0));
         blobs.push(new Blob(0, 0, 0, 0, 0, 0, 0));
+        all_blobs.push(blobs[0]);
+        all_blobs.push(blobs[1]);
     }
 
     p.draw = () => {
@@ -142,11 +144,12 @@ const sketch = (p: p5) => {
         const child = parent1.crossover(parent2);
         child.mutation(mutation_alpha);
         blobs.push(child);
+        all_blobs.push(child);
         if (blobs.length > 100) {
             let min_idx = 0;
-            let min_fitness = fitness_by_blobs(blobs, min_idx);
+            let min_fitness = fitness_by_blobs(blobs, blobs[min_idx]);
             blobs.forEach((element, idx) => {
-                const val: number = fitness_by_blobs(blobs, idx);
+                const val: number = fitness_by_blobs(all_blobs, element);
                 if (val < min_fitness) {
                     min_fitness = val;
                     min_idx = idx;
@@ -154,8 +157,8 @@ const sketch = (p: p5) => {
             })
             blobs = blobs.filter((_, idx) => idx != min_idx);
         }
-        blobs.sort((a, b) => fitness_by_blobs(blobs, blobs.indexOf(b)) - fitness_by_blobs(blobs, blobs.indexOf(a)));
-        const val = fitness_by_blobs(blobs, 0);
+        blobs.sort((a, b) => fitness_by_blobs(all_blobs, b) - fitness_by_blobs(all_blobs, a));
+        const val = fitness_by_blobs(all_blobs, blobs[0]);
         console.log("fitness: ", val);
     }
 }
