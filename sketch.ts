@@ -52,11 +52,14 @@ class Blob {
 }
 
 const fitness = (blob: Blob): number => {
-    return blob.r + blob.g + blob.b;
+    const bonus = Math.max(blob.r, blob.g, blob.b) - Math.min(blob.r, blob.g, blob.b);
+    return blob.r + blob.g + blob.b + bonus * 5;
 }
 
 const sketch = (p: p5) => {
     let blobs: Blob[] = [];
+    let timestamp = 0;
+
     p.setup = () => {
         p.createCanvas(400, 400)
         blobs.push(new Blob(0, 0, 0, 0, 0, 0, 0));
@@ -70,9 +73,18 @@ const sketch = (p: p5) => {
             p.rect(cnt % 10 * 40, Math.floor(cnt / 10) * 40, 40, 40);
             cnt += 1;
         });
+
+        if (p.millis() - timestamp > 100) {
+            timestamp = p.millis();
+            forward();
+        }
     }
 
     p.mouseClicked = () => {
+        forward();
+    }
+
+    const forward = () => {
         const parent1 = blobs[Math.floor(Math.random() * blobs.length)];
         const parent2 = blobs[Math.floor(Math.random() * blobs.length)];
         const child = parent1.crossover(parent2);
