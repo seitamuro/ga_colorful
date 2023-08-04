@@ -102,8 +102,9 @@ const sketch = (p: p5) => {
             })
             blobs = blobs.filter((_, idx) => idx != min_idx);
         }
+        blobs.sort((a, b) => fitness(b) - fitness(a));
+        const _show_fitness = blobs.map(fitness);
     }
-    blobs.sort((a, b) => fitness(a) - fitness(b));
 }
 
 new p5(sketch)
