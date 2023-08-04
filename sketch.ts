@@ -109,7 +109,6 @@ const sketch = (p: p5) => {
     let blobs: Blob[] = [];
     let all_blobs: Blob[] = [];
     let timestamp = 0;
-    let mutation_alpha = 0.3;
 
     p.setup = () => {
         p.createCanvas(400, 400)
@@ -130,7 +129,6 @@ const sketch = (p: p5) => {
         if (p.millis() - timestamp > 30) {
             timestamp = p.millis();
             forward();
-            mutation_alpha -= 0.001;
         }
     }
 
@@ -142,7 +140,7 @@ const sketch = (p: p5) => {
         const parent1 = blobs[Math.floor(Math.random() * blobs.length)];
         const parent2 = blobs[Math.floor(Math.random() * blobs.length)];
         const child = parent1.crossover(parent2);
-        child.mutation(mutation_alpha);
+        child.mutation();
         blobs.push(child);
         all_blobs.push(child);
         if (blobs.length > 100) {
