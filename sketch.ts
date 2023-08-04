@@ -23,9 +23,9 @@ class Blob {
         return new Blob(
             this.x,
             this.y,
-            this.clip(this.r + blob.r * Math.random() * 0.6 - 0.3),
-            this.clip(this.g + blob.g * Math.random() * 0.6 - 0.3),
-            this.clip(this.b + blob.b * Math.random() * 0.6 - 0.3),
+            this.clip(this.r + blob.r * (Math.random() * 0.6 - 0.3)),
+            this.clip(this.g + blob.g * (Math.random() * 0.6 - 0.3)),
+            this.clip(this.b + blob.b * (Math.random() * 0.6 - 0.3)),
             0,
             0
         )
